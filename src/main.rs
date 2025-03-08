@@ -13,6 +13,7 @@ use dotenvy::dotenv;
 use sqlx::{postgres::PgPoolOptions, PgPool};
 use tracing::{error, info};
 mod routes;
+mod types;
 
 struct AppState {
     pool: PgPool,
@@ -46,33 +47,41 @@ async fn main() {
         }
     };
 
-    let shared_state = Arc::new(AppState { pool: pool.clone() });
-
-    let _ = match sqlx::migrate!("./migrations").run(&pool).await {
-        Ok(()) => info!("�� Migrations executed successfully"),
-        Err(err) => {
-            error!("�� Failed to execute migrations: {:?}", err);
-            std::process::exit(1);
-        }
-    };
+    // let _ = match sqlx::migrate!("./migrations").run(&pool).await {
+    //     Ok(()) => info!("�� Migrations executed successfully"),
+    //     Err(err) => {
+    //         error!("�� Failed to execute migrations: {:?}", err);
+    //         std::process::exit(1);
+    //     }
+    // };
     // Clerk
     let config = ClerkConfiguration::new(None, None, Some(clerk_secret_key.to_string()), None);
     let clerk = Clerk::new(config);
+    let shared_state = Arc::new(AppState { pool: pool.clone() });
     let app = Router::new()
         .route("/", get(|| async { "Hello, World!" }))
-        .route(
-            "/webhooks/user/:clerk_user_id",
-            delete(routes::user_webhooks::delete),
-        )
         .route("/webhooks/user", post(routes::user_webhooks::upsert))
         .route(
-            "/whoami",
-            get(routes::user::whoami).layer(ClerkLayer::new(
-                MemoryCacheJwksProvider::new(clerk),
-                None,
-                true,
-            )),
+            "/webhooks/user/{clerk_user_id}",
+            delete(routes::user_webhooks::delete),
         )
+        .route(
+            "/instagram/upsert_instagram_access_token",
+            post(routes::instagram::upsert_instagram_access_token),
+        )
+        .route(
+            "/instagram/webhook_upsert",
+            post(routes::instagram::upsert_webhooks),
+        )
+        .route("/whoami", get(routes::user::whoami))
+        .layer(ClerkLayer::new(
+            MemoryCacheJwksProvider::new(clerk.clone()),
+            Some(vec![
+                "/instagram/upsert_instagram_access_token".to_string(),
+                "/whoami".to_string(),
+            ]),
+            true,
+        ))
         .layer(Extension(shared_state));
 
     // run our app with hyper, listening globally on port 3000

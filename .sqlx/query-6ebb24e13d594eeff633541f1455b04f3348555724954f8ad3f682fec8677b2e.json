@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                    users.clerk_user_id,\n                    array_remove(ARRAY_AGG(instagram.username), null) AS instagram_usernames\n            FROM\n                    users\n                    LEFT JOIN instagram ON instagram.clerk_user_id = users.clerk_user_id\n            WHERE\n                    users.clerk_user_id = $1\n            GROUP BY\n                    users.clerk_user_id;\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "clerk_user_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "instagram_usernames",
+        "type_info": "TextArray"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      true,
+      null
+    ]
+  },
+  "hash": "6ebb24e13d594eeff633541f1455b04f3348555724954f8ad3f682fec8677b2e"
+}

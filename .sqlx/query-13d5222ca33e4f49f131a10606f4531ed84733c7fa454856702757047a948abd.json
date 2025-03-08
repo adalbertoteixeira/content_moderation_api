@@ -1,0 +1,88 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            insert into users(\n                clerk_user_id,\n                username,\n                first_name,\n                last_name,\n                gender,\n                image_url,\n                email_address,\n                updated_at\n            )\n            values (\n                $1, $2, $3, $4, $5, $6, $7, NOW()\n            )\n            ON CONFLICT ( clerk_user_id) DO UPDATE SET\n                username = $2,\n                first_name = $3,\n                last_name = $4,\n                gender = $5,\n                image_url = $6,\n                updated_at = NOW()\n            returning *\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "username",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "birthday",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 3,
+        "name": "first_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "last_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "gender",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "image_url",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "email_address",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "clerk_user_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "13d5222ca33e4f49f131a10606f4531ed84733c7fa454856702757047a948abd"
+}

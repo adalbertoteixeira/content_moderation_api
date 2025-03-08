@@ -1,0 +1,42 @@
+name: Docker Image CI
+
+# 1
+# Controls when the workflow will run
+on:
+  push:
+    branches: ['develop']
+
+# Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Image version'
+        required: true
+
+#2
+env:
+  REGISTRY: 'registry.digitalocean.com/cdigital'
+  IMAGE_NAME: 'content_moderation_api_dev'
+
+#3
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v4
+
+      - name: Build container image
+        run: docker build --build-arg PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.PUBLIC_CLERK_PUBLISHABLE_KEY }} --build-arg PRIVATE_CLERK_SECRET_KEY=${{ secrets.PRIVATE_CLERK_SECRET_KEY }} --build-arg CLERK_SECRET_KEY=${{ secrets.PRIVATE_CLERK_SECRET_KEY }} -t $(echo $REGISTRY)/$(echo $IMAGE_NAME)_${{ github.ref_name }} .
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+         token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Log in to DigitalOcean Container Registry with short-lived credentials
+        run: doctl registry login --expiry-seconds 600
+
+      - name: Push image to DigitalOcean Container Registry
+        run: docker push $(echo $REGISTRY)/$(echo $IMAGE_NAME)_${{ github.ref_name }}
+
