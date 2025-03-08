@@ -22,7 +22,7 @@ struct AppState {
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt()
-        .with_max_level(tracing::Level::DEBUG)
+        // .with_max_level(tracing::Level::DEBUG)
         .init();
     dotenv().ok();
     info!("Starting server...");
@@ -85,6 +85,6 @@ async fn main() {
         .layer(Extension(shared_state));
 
     // run our app with hyper, listening globally on port 3000
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:4000").await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }
