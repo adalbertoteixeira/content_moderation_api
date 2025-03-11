@@ -47,13 +47,13 @@ async fn main() {
         }
     };
 
-    // let _ = match sqlx::migrate!("./migrations").run(&pool).await {
-    //     Ok(()) => info!("�� Migrations executed successfully"),
-    //     Err(err) => {
-    //         error!("�� Failed to execute migrations: {:?}", err);
-    //         std::process::exit(1);
-    //     }
-    // };
+    let _ = match sqlx::migrate!("./migrations").run(&pool).await {
+        Ok(()) => info!("�� Migrations executed successfully"),
+        Err(err) => {
+            error!("�� Failed to execute migrations: {:?}", err);
+            std::process::exit(1);
+        }
+    };
     // Clerk
     let config = ClerkConfiguration::new(None, None, Some(clerk_secret_key.to_string()), None);
     let clerk = Clerk::new(config);
